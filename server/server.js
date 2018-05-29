@@ -60,7 +60,12 @@ app.delete('/todos/:id', (req, res)=>{
     }, (e)=>{
         res.status(400).send();
     })
-})
+});
+
+app.patch('/todos/:id', (req, res)=>{
+    var id = req.params.id;
+
+});
 
 app.post('/users', (req, res)=>{
     var user = new User({
@@ -77,4 +82,6 @@ app.post('/users', (req, res)=>{
 app.listen(port, ()=>{
     console.log(`Started at port ${port}`);
 })
+
+module.exports = {app};
 

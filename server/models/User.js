@@ -5,6 +5,7 @@ var User = mongoose.model('User',{
         required:true,
         trim:true,
         minlength:1,
+        unique: true
 
     }
 });
