@@ -1,10 +1,18 @@
 const expect = require('expect');
 const request = require('supertest');
 const {ObjectID} = require('mongodb');
+const _ = require('lodash');
+const jwt = require('jsonwebtoken');
 
 const {app} = require('./../server');
 const {Todo} = require('./../models/todo');
+const {User} = require('./../models/User');
 
+
+var body1 = {
+    email:"moham@gmail.com",
+    password:"123abc1"
+};
 const todos = [{
     _id:new ObjectID(),
     text:"First Test todo"
@@ -182,5 +190,31 @@ describe('PATCH /todos/:id',()=>{
             expect(res.body.todo.completedAt).toNotExist();
         })
         .end(done);
-    })
+    });
+
+    
 });
+
+/* describe('POST /users',()=>{
+    it('should generate new token to the body and in the header', (done)=>{
+         var body = {
+            email:"moham@gmail.com",
+            password:"123abc1"
+        };
+        
+        var user = new User(body);
+        var access = 'auth';
+        var token = jwt.sign({
+            _id: user._id.toHexString(),
+            access: access
+        }, 'abc123').toString(); 
+        
+        request(app)
+        .post('/users')
+        .send({body, token})
+        .expect(200)
+        .expect(body).toBe(body1)
+        .end(done);
+        
+    });
+}); */
