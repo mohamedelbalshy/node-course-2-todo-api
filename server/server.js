@@ -10,10 +10,11 @@ const {ObjectID} = require('mongodb');
 var {mongoose} = require('./db/mongoose');
 var {Todo} = require('./models/todo');
 var {User} = require('./models/User');
+var {authenticate} = require('./middleware/authenticate');
 
 var app = express();
 const port = process.env.PORT || 3000;
-console.log(port)
+
 
 app.use(bodyParser.json());
 
@@ -102,24 +103,20 @@ app.post('/users', (req, res)=>{
         
         })
         .then((token)=>{
-            console.log(token);
+            
             res.header('x-auth',token).send(user);
         })
         .catch(e=>{
             res.status(400).send(e);
             
         });
-    
-/*     user.save().then(()=>{
-          user.generateAuthToken();
-        
-    }).then((token)=>{
-        console.log(token)
-        res.header('x-auth',token).send(user);
-    }).catch(e=>{
-        res.status(400).send(e);
-    }) */
 });
+
+
+
+app.post('/users/me',authenticate, (req, res)=>{
+    res.send(req.user);
+})
 
 
 app.listen(port, ()=>{
