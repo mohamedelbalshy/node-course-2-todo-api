@@ -12,24 +12,30 @@ var users = [{
     password:'password123',
     tokens:[{
         access:'auth',
-        token: jwt.sign({_id:userOneId.toHexString(), access:'auth'}, 'abc123').toString()
+        token: jwt.sign({_id:userOneId.toHexString(), access:'auth'}, process.env.JWT_SECRET).toString()
         }]  
 
     },{
     _id:userTwoId,
     email:'mohamed2@gmail.com',
-    password:'password456'
+    password:'password456',
+    tokens:[{
+        access:'auth',
+        token: jwt.sign({_id:userTwoId.toHexString(), access:'auth'}, process.env.JWT_SECRET).toString()
+        }]  
     }];
 
 
 const todos = [{
     _id:new ObjectID(),
-    text:"First Test todo"
+    text:"First Test todo",
+    _creator:userOneId
 },{
     _id:new ObjectID(),
     text:"Second Test todo",
     completed:true,
-    completedAt:333
+    completedAt:333,
+    _creator:userTwoId
 }];
 
 const populateTodos = (done)=>{
