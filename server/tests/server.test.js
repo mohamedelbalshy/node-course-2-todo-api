@@ -7,27 +7,16 @@ const jwt = require('jsonwebtoken');
 const {app} = require('./../server');
 const {Todo} = require('./../models/todo');
 const {User} = require('./../models/User');
+const {todos, populateTodos, users, populateUsers} = require('./seed/seed');
 
 
 var body1 = {
     email:"moham@gmail.com",
     password:"123abc1"
 };
-const todos = [{
-    _id:new ObjectID(),
-    text:"First Test todo"
-},{
-    _id:new ObjectID(),
-    text:"Second Test todo",
-    completed:true,
-    completedAt:333
-}];
 
-beforeEach((done)=>{
-    Todo.remove({}).then(()=>{
-        return Todo.insertMany(todos);
-    }).then(()=>done())
-});
+beforeEach(populateUsers);
+beforeEach(populateTodos);
 
 
 describe('POST /todos', ()=>{
@@ -194,6 +183,25 @@ describe('PATCH /todos/:id',()=>{
 
     
 });
+
+/* describe('GET /users/me',()=>{
+
+    it('should return users if authenticated',(done)=>{
+        request(app)
+        .get('/users/me')
+        .set('x-auth', users[0].tokens[0].token)
+        .expect(200)
+        .expect((res)=>{
+            expect(res.body._id).toBe(users[0]._id.toHexString());
+            expect(res.body.email).toBe(users[0].email);
+        })
+        .end(done);
+    });
+
+    it('should return 401 if not authenticated',()=>{
+
+    });
+}); */
 
 /* describe('POST /users',()=>{
     it('should generate new token to the body and in the header', (done)=>{
