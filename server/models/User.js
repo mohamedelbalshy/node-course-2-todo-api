@@ -11,11 +11,11 @@ var UserSchema = new mongoose.Schema({
         required:true,
         trim:true,
         minlength:1,
-        unique: true,
+        unique: true/* ,
         validate:{
             validator:validator.isEmail,
             message:'{VALUE} is not a valid email'
-        }
+        } */
 
     },
     password:{
@@ -23,7 +23,11 @@ var UserSchema = new mongoose.Schema({
         required:true,
         minlength:6
     },
-    tokens:[{
+    name:{
+        type: String,
+        minlength: 2  
+    },
+    tokens:{
         access:{
             type:String,
             required:true
@@ -32,24 +36,25 @@ var UserSchema = new mongoose.Schema({
             type:String,
             required:true
         }
-    }],
+    }
     
 });
 
-UserSchema.methods.toJSON = function () {
+/* UserSchema.methods.toJSON = function () {
     var user = this;
     var userObject = user.toObject();
 
     return _.pick(userObject, ['_id', 'email']);
-};
+}; */
 
 UserSchema.methods.generateAuthToken = function (){
     var user = this;
-    var access = 'auth';
+    var access = 'x-auth';
     var token = jwt.sign({_id: user._id.toHexString(),access}, process.env.JWT_SECRET).toString();
     
 
-    user.tokens = user.tokens.concat({access, token});
+    /* user.tokens = user.tokens.concat({access, token}); */
+    user.tokens = {access, token}
     return user.save().then(()=>{
         return token;
     });
@@ -76,7 +81,7 @@ UserSchema.statics.findByToken = function (token){
     }
     return User.findOne({
         _id:decoded._id,
-        'tokens.access':'auth',
+        'tokens.access':'x-auth',
         'tokens.token':token
     });
 };

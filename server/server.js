@@ -6,6 +6,7 @@ const _ = require('lodash');
 const express = require('express');
 const bodyParser = require('body-parser');
 const {ObjectID} = require('mongodb');
+const cors = require('cors');
 
 var {mongoose} = require('./db/mongoose');
 var {Todo} = require('./models/todo');
@@ -18,12 +19,15 @@ const port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 
+app.use(cors());
+
 app.post('/todos', authenticate, (req, res)=>{
     var todo = new Todo({
         text: req.body.text,
         _creator: req.user._id
     });
     todo.save().then((doc)=>{
+        console.log(req.body.text)
         res.send(doc);
     },(e)=>{
         res.status(400).send(e)
@@ -32,9 +36,9 @@ app.post('/todos', authenticate, (req, res)=>{
 
 app.get('/todos', authenticate,(req, res)=>{
     Todo.find({
-        _creator:req.user._id
+         _creator:req.user._id 
     }).then((todos)=>{
-        res.send({todos});
+        res.send(todos);
     },(e)=>{
         res.status(400).send(e);
     })
@@ -104,21 +108,20 @@ app.patch('/todos/:id', authenticate, (req, res)=>{
 });
 
 app.post('/users', (req, res)=>{
-    var body = _.pick(req.body,['email','password'])
+    var body = _.pick(req.body,['email','password','name'])
     var user = new User(body);
     
+    
+    
+    user.generateAuthToken();
     user.save().then(()=>{
-        return user.generateAuthToken();
         
-        })
-        .then((token)=>{
-            
-            res.header('x-auth',token).send(user);
+        res.send(user);
         })
         .catch(e=>{
             res.status(400).send(e);
             
-        });
+        }); 
 });
 
 
@@ -131,11 +134,11 @@ app.post('/users/login',(req, res)=>{
     var body = _.pick(req.body, ['email', 'password']);
 
     User.findByCredentials(body.email, body.password).then((user)=>{
-        return user.generateAuthToken().then((token)=>{
-            res.header('x-auth', token).send(user);
+            user.generateAuthToken();
+            res.send(user);
         })
-    }).catch(err=>{
-        res.status(400).send();
+        .catch(err=>{
+        res.status(400).send(err);
     })
 });
 
